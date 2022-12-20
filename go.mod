@@ -7,13 +7,13 @@ require (
 	github.com/kroonprins/vals v0.0.1-fork
 	github.com/spf13/cobra v1.6.1
 	github.com/thediveo/enumflag/v2 v2.0.1
-	golang.org/x/crypto v0.4.0
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.26.0
 	k8s.io/apimachinery v0.26.0
 	k8s.io/client-go v0.26.0
 	k8s.io/klog/v2 v2.80.1
 	sigs.k8s.io/yaml v1.3.0
+	software.sslmate.com/src/go-pkcs12 v0.2.0
 )
 
 require (
@@ -115,6 +115,7 @@ require (
 	go.mozilla.org/gopgagent v0.0.0-20170926210634-4d7ea76ff71a // indirect
 	go.mozilla.org/sops/v3 v3.7.1 // indirect
 	go.opencensus.io v0.23.0 // indirect
+	golang.org/x/crypto v0.4.0 // indirect
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
 	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1 // indirect
