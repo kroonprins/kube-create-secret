@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/kroonprins/kube-create-secret/pkg/types"
 )
@@ -29,12 +30,12 @@ func read(config Config) ([]types.SecretTemplate, types.Format, error) {
 			if skipped {
 				continue
 			}
-			errors := []error{}
+			errors := []string{}
 			success := false
 			for _, unmarshaller := range Unmarshallers {
 				unmarshalled, format, err := unmarshaller.Unmarshal(bytes)
 				if err != nil {
-					errors = append(errors, err)
+					errors = append(errors, fmt.Sprintf("%T: %s", unmarshaller, err.Error()))
 					continue
 				}
 				res = append(res, unmarshalled...)
@@ -43,7 +44,7 @@ func read(config Config) ([]types.SecretTemplate, types.Format, error) {
 				break
 			}
 			if !success {
-				return nil, 0, fmt.Errorf("could not parse input of %s: %v", inputFile, errors)
+				return nil, 0, fmt.Errorf("could not parse input of %s: %v", inputFile, strings.Join(errors, ", "))
 			}
 		}
 	}

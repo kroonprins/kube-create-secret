@@ -73,6 +73,8 @@ func (reCreateYamlUnmarshaller *ReCreateYamlUnmarshaller) Unmarshal(bytes []byte
 					return nil, 0, err
 				}
 				res = append(res, unmarshalled...)
+			} else {
+				return nil, 0, fmt.Errorf("annotation %s not present", constants.ANNOTATION)
 			}
 		}
 
@@ -90,6 +92,8 @@ func (reCreateYamlUnmarshaller *ReCreateYamlUnmarshaller) Unmarshal(bytes []byte
 						return nil, 0, fmt.Errorf("unmarshal error for %s: %v", annotation, err)
 					}
 					res = append(res, unmarshalled...)
+				} else {
+					return nil, 0, fmt.Errorf("annotation %s not present", constants.ANNOTATION)
 				}
 
 			}

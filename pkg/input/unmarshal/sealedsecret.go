@@ -89,7 +89,11 @@ func unmarshal(bytes []byte, unmarshaller func([]byte, interface{}) error, recre
 		return res, nil
 	}
 
-	return nil, fmt.Errorf("failed to unmarshal to either SealedSecret (%v) or List (%v)", errSealedSecret, errSealedSecretList)
+	if errSealedSecret != nil || errSealedSecretList != nil {
+		return nil, fmt.Errorf("failed to unmarshal to either SealedSecret (%v) or SealedSecretList (%v)", errSealedSecret, errSealedSecretList)
+	} else {
+		return nil, fmt.Errorf("failed to unmarshal to either SealedSecret or SealedSecretList")
+	}
 }
 
 func unmarshalSealedSecret(sealedSecret ssv1.SealedSecret, unmarshaller ReCreateJsonUnmarshaller) ([]types.SecretTemplate, error) {

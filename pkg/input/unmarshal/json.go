@@ -50,6 +50,8 @@ func (reCreateJsonUnmarshaller *ReCreateJsonUnmarshaller) Unmarshal(bytes []byte
 		if annotation, exists := secret.Annotations[constants.ANNOTATION]; exists {
 			unmarshalled, _, err := reCreateJsonUnmarshaller.jsonUnmarshaller.Unmarshal([]byte(annotation))
 			return unmarshalled, types.JSON, err
+		} else {
+			return nil, 0, fmt.Errorf("annotation %s not present", constants.ANNOTATION)
 		}
 	}
 
@@ -68,8 +70,9 @@ func (reCreateJsonUnmarshaller *ReCreateJsonUnmarshaller) Unmarshal(bytes []byte
 					return nil, 0, fmt.Errorf("unmarshal error for %s: %v", annotation, err)
 				}
 				res = append(res, unmarshalled...)
+			} else {
+				return nil, 0, fmt.Errorf("annotation %s not present", constants.ANNOTATION)
 			}
-
 		}
 		return res, types.JSON, nil
 	}
