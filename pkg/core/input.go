@@ -10,7 +10,7 @@ var InputReaders []InputReader
 var Unmarshallers []Unmarshaller
 
 type InputReader interface {
-	Read(inputFile string) (bool, []byte, error)
+	Read(inputFile string, config Config) (bool, []byte, error)
 }
 
 type Unmarshaller interface {
@@ -22,7 +22,7 @@ func read(config Config) ([]types.SecretTemplate, types.Format, error) {
 	var inputFormat types.Format
 	for _, inputFile := range config.InputFiles {
 		for _, inputReader := range InputReaders {
-			skipped, bytes, err := inputReader.Read(inputFile)
+			skipped, bytes, err := inputReader.Read(inputFile, config)
 			if err != nil {
 				return nil, 0, fmt.Errorf("unable to read file '%s': %v", inputFile, err)
 			}
