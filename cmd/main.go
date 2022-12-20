@@ -19,9 +19,8 @@ func newRootCmd() *cobra.Command {
 		Use:   "kube-create-secret",
 		Short: "Utility for creating kubernetes secrets.",
 		Long:  `Utility for creating kubernetes secrets.`,
-		Example: " kube-create-secret help create\n" +
-			"  kube-create-secret create -f template.yaml\n" +
-			"  kube-create-secret recreate -f secret.yaml\n" +
+		Example: "  kube-create-secret create -f template.yaml\n" +
+			"  kube-create-secret re-create -f secret.yaml\n" +
 			"  kube-create-secret show -f secret.yaml\n",
 	}
 

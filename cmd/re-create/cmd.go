@@ -47,8 +47,8 @@ func init() {
 var Cmd = &cobra.Command{
 	Use:     "re-create",
 	Aliases: []string{"r"},
-	Short:   "Re-create a secret from a Secret that was previously create with kube-create-secret.",
-	Long:    `Re-create a secret from a Secret that was previously create with kube-create-secret.`,
+	Short:   "Re-create a secret from a Secret that was previously created with kube-create-secret.",
+	Long:    `Re-create a secret from a Secret that was previously created with kube-create-secret.`,
 	Example: "  kube-create-secret re-create -f secret.yml\n" +
 		"  kube-create-secret re-create -f secret.json\n" +
 		"  kube-create-secret re-create -f secret1.yml -f secret2.yml\n" +

@@ -31,13 +31,13 @@ func init() {
 var Cmd = &cobra.Command{
 	Use:     "show",
 	Aliases: []string{"s"},
-	Short:   "Show the template for a Secret that was previously create with kube-create-secret.",
-	Long:    `Show the template for a Secret that was previously create with kube-create-secret.`,
+	Short:   "Show the template for a Secret that was previously created with kube-create-secret.",
+	Long:    `Show the template for a Secret that was previously created with kube-create-secret.`,
 	Example: "  kube-create-secret show -f secret.yml\n" +
 		"  kube-create-secret show -f secret.json\n" +
 		"  kube-create-secret show -f secret1.yml -f secret2.yml\n" +
 		"  cat secret.yml | kube-create-secret show -f -\n" +
-		"  kube-create-secret re-create -f secret.yml -o json\n",
+		"  kube-create-secret show -f secret.yml -o json\n",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(config.InputFiles) == 0 {
 			return fmt.Errorf("reguired flag \"filename\" not set")
