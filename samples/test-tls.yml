@@ -1,0 +1,50 @@
+---
+apiVersion: kube-create-secret/v1
+kind: SecretTemplate
+metadata:
+  name: my-pkcs12-secret-template-1
+spec:
+  metadata:
+    name: my-tls-secret-1
+    namespace: default
+  tls: 
+    pkcs12: ref+file://my-keystore.pfx
+  type: kubernetes.io/tls
+---
+apiVersion: kube-create-secret/v1
+kind: SecretTemplate
+metadata:
+  name: my-pkcs12-pems-secret-template-2
+spec:
+  metadata:
+    name: my-tls-secret-2
+    namespace: default
+  data:
+    tls.key: ref+file://my-key.key
+    tls.crt: ref+file://my-certificate.crt
+  type: kubernetes.io/tls
+---
+apiVersion: kube-create-secret/v1
+kind: SecretTemplate
+metadata:
+  name: my-pkcs12-with-password-secret-template-3
+spec:
+  metadata:
+    name: my-tls-secret-3
+    namespace: default
+  tls:
+    pkcs12: ref+file://my-keystore-with-password.pfx
+    password: ref+envsubst://$VAR1
+  type: kubernetes.io/tls
+---
+apiVersion: kube-create-secret/v1
+kind: SecretTemplate
+metadata:
+  name: my-pkcs12-secret-template-4
+spec:
+  metadata:
+    name: my-tls-secret-4
+    namespace: default
+  tls: 
+    pkcs12: ref+azurekeyvault://my-vault/my-vault-certificate
+  type: kubernetes.io/tls

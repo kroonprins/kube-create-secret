@@ -1,0 +1,4 @@
+- other kubernetes secret types (kubectl supports docker-registry)?
+- bash completion
+- dependabot 
+- kubectl plugin?

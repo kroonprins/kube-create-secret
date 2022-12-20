@@ -1,0 +1,30 @@
+project_name: kube-create-secret
+builds:
+  - id: kube-create-secret
+    main: ./cmd/main.go
+    binary: kube-create-secret
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+      - "386"
+    mod_timestamp: '{{ .CommitTimestamp }}'
+checksum:
+  name_template: '{{ .ProjectName }}_checksums.txt'    
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^typo:'
+      - Merge pull request
+      - Merge branch
+      - go mod tidy

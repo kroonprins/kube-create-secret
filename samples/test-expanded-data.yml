@@ -1,0 +1,12 @@
+---
+apiVersion: kube-create-secret/v1
+kind: SecretTemplate
+metadata:
+  name: my-expanded-secret-template-1
+spec:
+  metadata:
+    name: created-expanded-secret-1
+    namespace: kube-system
+  data: ref+azurekeyvault://my-vault#/*
+  stringData: ref+azurekeyvault://my-vault#/* 
+  type: Opaque

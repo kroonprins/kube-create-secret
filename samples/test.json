@@ -1,0 +1,24 @@
+{
+  "apiVersion": "kube-create-secret/v1",
+  "kind": "SecretTemplate",
+  "metadata": {
+    "name": "my-secret-template-1"
+  },
+  "spec": {
+    "apiVersion": "v1",
+    "kind": "Secret",
+    "metadata": {
+      "name": "created-secret-1",
+      "namespace": "kube-system"
+    },
+    "data": {
+      "POSTGRES_PASSWORD": "ref+azurekeyvault://my-vault/postgres-password",
+      "POSTGRES_USERNAME": "postgres",
+      "VAR1": "ref+envsubst://$VAR1"
+    },
+    "stringData": {
+      "API_TOKEN": "ref+azurekeyvault://my-vault/api-token"
+    },
+    "type": "Opaque"
+  }
+}

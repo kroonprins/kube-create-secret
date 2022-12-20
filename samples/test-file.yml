@@ -1,0 +1,16 @@
+---
+apiVersion: kube-create-secret/v1
+kind: SecretTemplate
+metadata:
+  name: my-file-secret-template-1
+spec:
+  metadata:
+    name: created-file-secret-1
+    namespace: kube-system
+  data:
+    FILE_1_CONTENT: ref+file://files/test-file-1.txt
+    FILE_2_CONTENT: ref+file://files/test-file-2.txt
+  stringData:
+    FILE_1_CONTENT: ref+file://files/test-file-1.txt
+    FILE_2_CONTENT: ref+file://files/test-file-2.txt
+  type: Opaque
