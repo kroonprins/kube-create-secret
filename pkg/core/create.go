@@ -44,7 +44,7 @@ func getMetaData(secretTemplate *types.SecretTemplate) (*v1.ObjectMeta, error) {
 	}
 
 	res := &v1.ObjectMeta{}
-	secretTemplate.ObjectMeta.DeepCopyInto(res)
+	secretTemplate.Spec.ObjectMeta.DeepCopyInto(res)
 
 	var annotations = make(map[string]string)
 	for k, v := range secretTemplate.ObjectMeta.GetAnnotations() {
