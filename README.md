@@ -249,6 +249,7 @@ metadata:
   annotations:
     kube-create-secret/source: '{"kind":"SecretTemplate","apiVersion":"kube-create-secret/v1","metadata":{"name":"my-expanded-secret-template-1","creationTimestamp":null},"spec":{"kind":"Secret","apiVersion":"v1","metadata":{"name":"created-expanded-secret-1","namespace":"kube-system","creationTimestamp":null},"type":"Opaque","data":"ref+azurekeyvault://my-vault#/*","stringData":"ref+azurekeyvault://my-vault#/*"}}'
   name: created-expanded-secret-1
+  namespace: kube-system
 data:
   api-token: bXktc2VjcmV0LXRva2Vu
   postgres-password: bXktcG9zdGdyZXNzLXBhc3N3b3Jk
@@ -290,6 +291,7 @@ metadata:
   annotations:
     kube-create-secret/source: '{"kind":"SecretTemplate","apiVersion":"kube-create-secret/v1","metadata":{"name":"my-pkcs12-secret-template","creationTimestamp":null},"spec":{"kind":"Secret","apiVersion":"v1","metadata":{"name":"my-tls-secret","namespace":"default","creationTimestamp":null},"type":"kubernetes.io/tls","tls":{"pkcs12":"ref+azurekeyvault://my-vault/my-vault-certificate"}}}'
   name: my-tls-secret
+  namespace: default
 data:
   tls.crt: LS0tL...........SUNBVEUtLS0tLQo=
   tls.key: LS0tL...SBLRVktLS0tLQo=
@@ -337,6 +339,7 @@ spec:
   kind: Secret
   metadata:
     name: created-sealed-secret-1
+    namespace: default
   data:
     VAR: ref+envsubst://\$VAR1
   type: Opaque
@@ -377,7 +380,7 @@ $ kubectl get secret my-secret -o yaml | kube-create-secret re-create -f - | kub
 
 It retrieves the secret from the cluster, re-evaluates the template of it with the latest values for the `vals` references, and then re-applies it on the cluster.
 
-If an extra secret value needs to be added, the template can first be retrieved back via `kube-create-secret show` after which the template can be updated and the secret re-generated via `kube-create-secret show`. 
+If an extra secret value needs to be added, the template can first be retrieved back via `kube-create-secret show` after which the template can be updated and the secret re-generated via `kube-create-secret create`. 
 
 ```shell
 $ kubectl get secret my-secret -o yaml | kube-create-secret show -f -
