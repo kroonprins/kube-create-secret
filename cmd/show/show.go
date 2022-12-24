@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bitnami-labs/sealed-secrets/pkg/pflagenv"
+	"github.com/kroonprins/kube-create-secret/cmd/constants"
 	"github.com/kroonprins/kube-create-secret/pkg/core"
 	"github.com/kroonprins/kube-create-secret/pkg/input/read"
 	"github.com/kroonprins/kube-create-secret/pkg/input/unmarshal"
@@ -20,12 +22,14 @@ var (
 )
 
 func init() {
-	Cmd.PersistentFlags().StringSliceVarP(&config.InputFiles, "filename", "f", nil, "The files that contain the secrets to generate. Use '-' to read from stdin.")
-	Cmd.MarkPersistentFlagFilename("filename")
-	Cmd.PersistentFlags().VarP(enumflag.NewSlice(&config.OutputFormats, "output", types.FormatIds, enumflag.EnumCaseInsensitive), "output", "o", "Output format. One of: (json, yaml). If not specified the format of the input is used.")
+	fs := Cmd.PersistentFlags()
 
-	fs := Cmd.Flags()
+	fs.StringSliceVarP(&config.InputFiles, "filename", "f", nil, "The files that contain the secrets to generate. Use '-' to read from stdin.")
+	Cmd.MarkPersistentFlagFilename("filename")
+	fs.VarP(enumflag.NewSlice(&config.OutputFormats, "output", types.FormatIds, enumflag.EnumCaseInsensitive), "output", "o", "Output format. One of: (json, yaml). If not specified the format of the input is used.")
+
 	fs.AddGoFlagSet(goflag.CommandLine)
+	pflagenv.SetFlagsFromEnv(constants.FLAGENV_PREFIX, fs)
 }
 
 var Cmd = &cobra.Command{

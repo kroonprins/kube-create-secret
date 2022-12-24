@@ -30,7 +30,7 @@ func newRootCmd() *cobra.Command {
 		Example: "  kube-create-secret version\n",
 		Long:    ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("Version: %s", Version)
+			fmt.Printf("Version: %s\n", Version)
 		},
 	}
 

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bitnami-labs/sealed-secrets/pkg/pflagenv"
+	"github.com/kroonprins/kube-create-secret/cmd/constants"
 	"github.com/kroonprins/kube-create-secret/pkg/core"
 	"github.com/kroonprins/kube-create-secret/pkg/input/read"
 	"github.com/kroonprins/kube-create-secret/pkg/input/unmarshal"
@@ -25,31 +27,35 @@ var (
 )
 
 func init() {
-	Cmd.PersistentFlags().StringSliceVarP(&config.InputFiles, "filename", "f", nil, "The files that contain the secrets to generate. Use '-' to read from stdin.")
-	Cmd.MarkPersistentFlagFilename("filename")
-	Cmd.PersistentFlags().VarP(enumflag.NewSlice(&config.OutputFormats, "output", types.FormatIds, enumflag.EnumCaseInsensitive), "output", "o", "Output format. One of: (json, yaml, sealed-secret). If not specified the format of the input is used. In case of sealed-secret this can be combined with a second format json or yaml to specifiy the format of the SealedSecret")
+	fs := Cmd.PersistentFlags()
 
-	Cmd.PersistentFlags().StringVar(&kubesealConfig.CertURL, "kubeseal-cert", "", "Only relevant if output format is sealed-secret. Certificate / public key file/URL to use for encryption. Overrides --controller-*")
-	Cmd.PersistentFlags().StringVar(&kubesealConfig.ControllerNs, "kubeseal-controller-namespace", metav1.NamespaceSystem, "Only relevant if output format is sealed-secret. Namespace of sealed-secrets controller.")
-	Cmd.PersistentFlags().StringVar(&kubesealConfig.ControllerName, "kubeseal-controller-name", "sealed-secrets-controller", "Only relevant if output format is sealed-secret. Name of sealed-secrets controller.")
-	Cmd.PersistentFlags().BoolVar(&kubesealConfig.AllowEmptyData, "kubeseal-allow-empty-data", false, "Only relevant if output format is sealed-secret. Allow empty data in the secret object")
-	Cmd.PersistentFlags().StringVar(&kubesealConfig.Kubeconfig, "kubeseal-kubeconfig", "", "Only relevant if output format is sealed-secret. Path to a kube config. Only required if out-of-cluster")
-	Cmd.PersistentFlags().Var(&kubesealConfig.SealingScope, "kubeseal-scope", "Only relevant if output format is sealed-secret. Set the scope of the sealed secret: strict, namespace-wide, cluster-wide (defaults to strict). Mandatory for --raw, otherwise the 'sealedsecrets.bitnami.com/cluster-wide' and 'sealedsecrets.bitnami.com/namespace-wide' annotations on the input secret can be used to select the scope.")
+	fs.StringSliceVarP(&config.InputFiles, "filename", "f", nil, "The files that contain the secrets to generate. Use '-' to read from stdin.")
+	Cmd.MarkPersistentFlagFilename("filename")
+	fs.VarP(enumflag.NewSlice(&config.OutputFormats, "output", types.FormatIds, enumflag.EnumCaseInsensitive), "output", "o", "Output format. One of: (json, yaml, sealed-secret). If not specified the format of the input is used. In case of sealed-secret this can be combined with a second format json or yaml to specifiy the format of the SealedSecret")
+
+	fs.StringVar(&kubesealConfig.CertURL, "kubeseal-cert", "", "Only relevant if output format is sealed-secret. Certificate / public key file/URL to use for encryption. Overrides --controller-*")
+	fs.StringVar(&kubesealConfig.ControllerNs, "kubeseal-controller-namespace", metav1.NamespaceSystem, "Only relevant if output format is sealed-secret. Namespace of sealed-secrets controller.")
+	fs.StringVar(&kubesealConfig.ControllerName, "kubeseal-controller-name", "sealed-secrets-controller", "Only relevant if output format is sealed-secret. Name of sealed-secrets controller.")
+	fs.BoolVar(&kubesealConfig.AllowEmptyData, "kubeseal-allow-empty-data", false, "Only relevant if output format is sealed-secret. Allow empty data in the secret object")
+	fs.StringVar(&kubesealConfig.Kubeconfig, "kubeseal-kubeconfig", "", "Only relevant if output format is sealed-secret. Path to a kube config. Only required if out-of-cluster")
+	fs.Var(&kubesealConfig.SealingScope, "kubeseal-scope", "Only relevant if output format is sealed-secret. Set the scope of the sealed secret: strict, namespace-wide, cluster-wide (defaults to strict). Mandatory for --raw, otherwise the 'sealedsecrets.bitnami.com/cluster-wide' and 'sealedsecrets.bitnami.com/namespace-wide' annotations on the input secret can be used to select the scope.")
 
 	klog.InitFlags(nil)
 
-	fs := Cmd.Flags()
 	fs.AddGoFlagSet(goflag.CommandLine)
 
 	kflags := clientcmd.RecommendedConfigOverrideFlags("kubeseal-k8s-")
 	clientcmd.BindOverrideFlags(&configOverrides, fs, kflags)
+
+	pflagenv.SetFlagsFromEnv(constants.FLAGENV_PREFIX, fs)
 }
 
 var Cmd = &cobra.Command{
 	Use:     "create",
 	Aliases: []string{"c"},
 	Short:   "Create a secret from a SecretTemplate definition.",
-	Long:    `Create a secret from a SecretTemplate definition.`,
+	Long: "Create a secret from a SecretTemplate definition.\n\n" +
+		fmt.Sprintf("Flags can be set via environment variables that are prefixed with %s_ prefix. For example --kubeseal-controller-namespace can be set via %s_KUBESEAL_CONTROLLER_NAMESPACE\n", constants.FLAGENV_PREFIX, constants.FLAGENV_PREFIX),
 	Example: "  kube-create-secret create -f template.yml\n" +
 		"  kube-create-secret create -f template.json\n" +
 		"  kube-create-secret create -f template1.yml -f template2.yml\n" +
