@@ -1,8 +1,6 @@
 package util
 
 import (
-	"crypto/ecdsa"
-	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
@@ -35,27 +33,14 @@ func ToPEM(fileContent string, password string) ([]byte, []byte, error) {
 		)...)
 	}
 
-	var privateKeyBytes []byte
-	switch typed_privateKey := privateKey.(type) {
-	case *rsa.PrivateKey:
-		privateKeyBytes = x509.MarshalPKCS1PrivateKey(typed_privateKey)
-	case *ecdsa.PrivateKey:
-		privateKeyBytes, err = x509.MarshalECPrivateKey(typed_privateKey)
-		if err != nil {
-			return nil, nil, fmt.Errorf("unable to marshal ec private key: %v", err)
-		}
-	case string:
-		privateKeyBytes, err = x509.MarshalPKCS8PrivateKey(typed_privateKey)
-		if err != nil {
-			return nil, nil, fmt.Errorf("unable to marshal pkcs8 private key: %v", err)
-		}
-	default:
-		return nil, nil, fmt.Errorf("unhandled private key type: %T", privateKey)
+	privateKeyBytes, err := x509.MarshalPKCS8PrivateKey(privateKey)
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to marshal pkcs8 private key: %v", err)
 	}
 
 	key := pem.EncodeToMemory(
 		&pem.Block{
-			Type:  "RSA PRIVATE KEY",
+			Type:  "PRIVATE KEY",
 			Bytes: privateKeyBytes,
 		},
 	)
