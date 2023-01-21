@@ -30,7 +30,7 @@ func preResolve(secretTemplate *types.SecretTemplate) (*types.PreResolvedSecretT
 		if err != nil {
 			return nil, err
 		}
-		preResolvedSecretTemplateSpec.PreResolvedTls = preResolvedTls
+		preResolvedSecretTemplateSpec.PreResolvedTls = &preResolvedTls
 	}
 
 	return &preResolvedSecretTemplateSpec, nil
@@ -55,9 +55,13 @@ func PreResolveData(data interface{}) (interface{}, error) {
 	}
 }
 
-func PreResolveTls(tls *types.Tls) (map[string]interface{}, error) {
-	res := make(map[string]interface{})
-	res["pkcs12"] = tls.Pkcs12
-	res["password"] = tls.Password
-	return res, nil
+func PreResolveTls(tls *types.Tls) (types.PreResolvedTls, error) {
+	toResolve := make(map[string]interface{})
+	toResolve["pkcs12"] = tls.Pkcs12
+	toResolve["password"] = tls.Password
+
+	return types.PreResolvedTls{
+		ToResolve: toResolve,
+		Tls:       tls,
+	}, nil
 }

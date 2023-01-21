@@ -33,11 +33,14 @@ func resolve(preResolvedSecretTemplateSpec *types.PreResolvedSecretTemplateSpec)
 	}
 
 	if preResolvedSecretTemplateSpec.PreResolvedTls != nil {
-		resolved, err := runtime.Eval(map[string]interface{}{"inline": preResolvedSecretTemplateSpec.PreResolvedTls})
+		resolved, err := runtime.Eval(map[string]interface{}{"inline": preResolvedSecretTemplateSpec.PreResolvedTls.ToResolve})
 		if err != nil {
 			return nil, fmt.Errorf("failure resolving vals for tls: %v", err)
 		}
-		resolvedSecretTemplateSpec.ResolvedTls = resolved["inline"].(map[string]interface{})
+		resolvedSecretTemplateSpec.ResolvedTls = &types.ResolvedTls{
+			Resolved: resolved["inline"].(map[string]interface{}),
+			Tls:      preResolvedSecretTemplateSpec.PreResolvedTls.Tls,
+		}
 	}
 
 	return &resolvedSecretTemplateSpec, nil

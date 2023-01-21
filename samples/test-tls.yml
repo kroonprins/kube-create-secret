@@ -2,7 +2,7 @@
 apiVersion: kube-create-secret/v1
 kind: SecretTemplate
 metadata:
-  name: my-pkcs12-secret-template-1
+  name: my-pkcs12-secret-template
 spec:
   metadata:
     name: my-tls-secret-1
@@ -14,7 +14,7 @@ spec:
 apiVersion: kube-create-secret/v1
 kind: SecretTemplate
 metadata:
-  name: my-pkcs12-pems-secret-template-2
+  name: my-pkcs12-pems-secret-template
 spec:
   metadata:
     name: my-tls-secret-2
@@ -27,7 +27,7 @@ spec:
 apiVersion: kube-create-secret/v1
 kind: SecretTemplate
 metadata:
-  name: my-pkcs12-with-password-secret-template-3
+  name: my-pkcs12-with-password-secret-template
 spec:
   metadata:
     name: my-tls-secret-3
@@ -40,7 +40,7 @@ spec:
 apiVersion: kube-create-secret/v1
 kind: SecretTemplate
 metadata:
-  name: my-pkcs12-secret-template-4
+  name: my-azure-key-vault-cert-secret-template
 spec:
   metadata:
     name: my-tls-secret-4
@@ -48,3 +48,46 @@ spec:
   tls: 
     pkcs12: ref+azurekeyvault://my-vault/my-vault-certificate
   type: kubernetes.io/tls
+---
+apiVersion: kube-create-secret/v1
+kind: SecretTemplate
+metadata:
+  name: my-pkcs12-secret-template-with-name
+spec:
+  metadata:
+    name: my-tls-secret-5
+    namespace: default
+  tls: 
+    pkcs12: ref+file://my-keystore.pfx
+    name: foo
+  type: kubernetes.io/tls
+---
+apiVersion: kube-create-secret/v1
+kind: SecretTemplate
+metadata:
+  name: my-pkcs12-secret-template-with-names
+spec:
+  metadata:
+    name: my-tls-secret-5
+    namespace: default
+  tls: 
+    pkcs12: ref+file://my-keystore.pfx
+    key:
+      name: foo.key
+    crt:
+      name: bar.crt
+  type: kubernetes.io/tls
+---
+apiVersion: kube-create-secret/v1
+kind: SecretTemplate
+metadata:
+  name: my-pkcs12-secret-template-with-certificate-chain-delimiter
+spec:
+  metadata:
+    name: my-tls-secret-5
+    namespace: default
+  tls: 
+    pkcs12: ref+file://my-keystore.pfx
+    crt:
+      delimiter: ","
+  type: kubernetes.io/tls  

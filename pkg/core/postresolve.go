@@ -1,6 +1,9 @@
 package core
 
 import (
+	"fmt"
+
+	"github.com/kroonprins/kube-create-secret/pkg/constants"
 	"github.com/kroonprins/kube-create-secret/pkg/core/util"
 	"github.com/kroonprins/kube-create-secret/pkg/types"
 )
@@ -47,16 +50,51 @@ func PostResolveData[T []byte | string](data map[string]interface{}, mapper func
 	return res, nil
 }
 
-func PostResolveTls(resolvedTls map[string]interface{}) (*types.ResolvedTls, error) {
-	fileContent := resolvedTls["pkcs12"].(string)
-	password := resolvedTls["password"].(string)
+func PostResolveTls(resolvedTls *types.ResolvedTls) (*types.PostResolvedTls, error) {
+	fileContent := resolvedTls.Resolved["pkcs12"].(string)
+	password := resolvedTls.Resolved["password"].(string)
 
-	key, crt, err := util.ToPEM(fileContent, password)
+	var chainDelimiter string
+	if resolvedTls.Tls.CrtConfig != nil {
+		chainDelimiter = resolvedTls.Tls.CrtConfig.ChainDelimiter
+	}
+
+	key, crt, err := util.ToPEM(fileContent, password, chainDelimiter)
 	if err != nil {
 		return nil, err
 	}
-	return &types.ResolvedTls{
-		Key: key,
-		Crt: crt,
+	return &types.PostResolvedTls{
+		Key: &types.TlsSecretData{
+			Value: key,
+			Name:  getKeyName(resolvedTls),
+		},
+		Crt: &types.TlsSecretData{
+			Value: crt,
+			Name:  getCrtName(resolvedTls),
+		},
 	}, nil
+}
+
+func getKeyName(resolvedTls *types.ResolvedTls) string {
+	if resolvedTls.Tls.KeyConfig != nil && resolvedTls.Tls.KeyConfig.Name != "" {
+		return resolvedTls.Tls.KeyConfig.Name
+	}
+
+	if resolvedTls.Tls.Name != "" {
+		return fmt.Sprintf("%s.key", resolvedTls.Tls.Name)
+	}
+
+	return constants.TLS_SECRET_KEY_FIELD
+}
+
+func getCrtName(resolvedTls *types.ResolvedTls) string {
+	if resolvedTls.Tls.CrtConfig != nil && resolvedTls.Tls.CrtConfig.Name != "" {
+		return resolvedTls.Tls.CrtConfig.Name
+	}
+
+	if resolvedTls.Tls.Name != "" {
+		return fmt.Sprintf("%s.crt", resolvedTls.Tls.Name)
+	}
+
+	return constants.TLS_SECRET_CRT_FIELD
 }

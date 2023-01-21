@@ -2,10 +2,10 @@
 
 `kubectl create secret` but with extras. Built on top of [vals](https://github.com/variantdev/vals), so all back-ends handled by `vals` can be used (AWS secret manager, Hashicorp Vault, Azure Key Vault, ...)
 
-Create a secret from a  `SecretTemplate` containing `vals` expression to resolve the secrets. Extras on top of what `vals` already gives out of the box:
+Create a secret from a `SecretTemplate` containing `vals` expression to resolve the secrets. Extras on top of what `vals` already gives out of the box:
 
 - create a `Secret` of type `kubernetes.io/tls` directly from a pkcs12 keystore
-- optionally output directly as a `SealedSecret` 
+- optionally output directly as a `SealedSecret`
 - adds an annotation `kube-create-secret/source` on the generated `Secret` (or `SealedSecret` template) containing the original template, to keep track of where the secret values originate from. Easily recreate the secret based on this annotation.
 
 ```shell
@@ -102,7 +102,7 @@ spec:
     name: created-secret-2
   stringData:
     VAR: ref+envsubst://\$VAR2
-  type: Opaque  
+  type: Opaque
 EOF
 ```
 
@@ -182,41 +182,41 @@ Which gives:
 
 ```json
 {
-    "kind": "List",
-    "apiVersion": "v1",
-    "metadata": {},
-    "items": [
-        {
-            "kind": "Secret",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "created-secret-1",
-                "creationTimestamp": null,
-                "annotations": {
-                    "kube-create-secret/source": "{\"kind\":\"SecretTemplate\",\"apiVersion\":\"kube-create-secret/v1\",\"metadata\":{\"name\":\"my-secret-template-1\",\"creationTimestamp\":null},\"spec\":{\"kind\":\"Secret\",\"apiVersion\":\"v1\",\"metadata\":{\"name\":\"created-secret-1\",\"creationTimestamp\":null},\"type\":\"Opaque\",\"stringData\":{\"VAR\":\"ref+envsubst://$VAR1\"}}}"
-                }
-            },
-            "stringData": {
-                "VAR": "foo"
-            },
-            "type": "Opaque"
-        },
-        {
-            "kind": "Secret",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "created-secret-2",
-                "creationTimestamp": null,
-                "annotations": {
-                    "kube-create-secret/source": "{\"kind\":\"SecretTemplate\",\"apiVersion\":\"kube-create-secret/v1\",\"metadata\":{\"name\":\"my-secret-template-2\",\"creationTimestamp\":null},\"spec\":{\"kind\":\"Secret\",\"apiVersion\":\"v1\",\"metadata\":{\"name\":\"created-secret-2\",\"creationTimestamp\":null},\"type\":\"Opaque\",\"stringData\":{\"VAR\":\"ref+envsubst://$VAR2\"}}}"
-                }
-            },
-            "stringData": {
-                "VAR": "bar"
-            },
-            "type": "Opaque"
+  "kind": "List",
+  "apiVersion": "v1",
+  "metadata": {},
+  "items": [
+    {
+      "kind": "Secret",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "created-secret-1",
+        "creationTimestamp": null,
+        "annotations": {
+          "kube-create-secret/source": "{\"kind\":\"SecretTemplate\",\"apiVersion\":\"kube-create-secret/v1\",\"metadata\":{\"name\":\"my-secret-template-1\",\"creationTimestamp\":null},\"spec\":{\"kind\":\"Secret\",\"apiVersion\":\"v1\",\"metadata\":{\"name\":\"created-secret-1\",\"creationTimestamp\":null},\"type\":\"Opaque\",\"stringData\":{\"VAR\":\"ref+envsubst://$VAR1\"}}}"
         }
-    ]
+      },
+      "stringData": {
+        "VAR": "foo"
+      },
+      "type": "Opaque"
+    },
+    {
+      "kind": "Secret",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "created-secret-2",
+        "creationTimestamp": null,
+        "annotations": {
+          "kube-create-secret/source": "{\"kind\":\"SecretTemplate\",\"apiVersion\":\"kube-create-secret/v1\",\"metadata\":{\"name\":\"my-secret-template-2\",\"creationTimestamp\":null},\"spec\":{\"kind\":\"Secret\",\"apiVersion\":\"v1\",\"metadata\":{\"name\":\"created-secret-2\",\"creationTimestamp\":null},\"type\":\"Opaque\",\"stringData\":{\"VAR\":\"ref+envsubst://$VAR2\"}}}"
+        }
+      },
+      "stringData": {
+        "VAR": "bar"
+      },
+      "type": "Opaque"
+    }
+  ]
 }
 ```
 
@@ -234,7 +234,7 @@ spec:
     name: created-expanded-secret-1
     namespace: kube-system
   data: ref+azurekeyvault://my-vault#/*
-  stringData: ref+azurekeyvault://my-vault#/* 
+  stringData: ref+azurekeyvault://my-vault#/*
   type: Opaque
 EOF
 ```
@@ -259,7 +259,6 @@ stringData:
 type: Opaque
 ```
 
-
 ## Tls secrets
 
 `kubectl create secret tls NAME --cert=path/to/cert/file --key=path/to/key/file` allows creating a `Secret` of type `kubernetes.io/tls`, but you need the key and certificate already in PEM format. Often the key and cert are in a keystore. For example in Azure Key Vault certificates can be stored and retrieved in pkcs12 format. To create a tls secret from such a file:
@@ -275,7 +274,7 @@ spec:
   metadata:
     name: my-tls-secret
     namespace: default
-  tls: 
+  tls:
     pkcs12: ref+azurekeyvault://my-vault/my-vault-certificate
   type: kubernetes.io/tls
 EOF
@@ -301,9 +300,57 @@ type: kubernetes.io/tls
 If the key store has a password, the password can be defined in the template, e.g.:
 
 ```yaml
-  tls: 
-    pkcs12: ref+azurekeyvault://my-vault/my-vault-certificate
-    password: ref+envsubst://$PASSWORD
+tls:
+  pkcs12: ref+azurekeyvault://my-vault/my-vault-certificate
+  password: ref+envsubst://$PASSWORD
+```
+
+To specify the name of the key and crt in the secret:
+
+```yaml
+tls:
+  pkcs12: ref+azurekeyvault://my-vault/my-vault-certificate
+  name: foo
+```
+
+Which will result in:
+
+```yaml
+spec:
+  ...
+  data:
+    foo.key: ...
+    foo.crt: ...
+```
+
+Alternatively, a different name for the key and certificate can be given:
+
+```yaml
+tls:
+  pkcs12: ref+azurekeyvault://my-vault/my-vault-certificate
+  key:
+    name: foo.key
+  crt:
+    name: bar.crt
+```
+
+Resulting in:
+
+```yaml
+spec:
+  ...
+  data:
+    foo.key: ...
+    bar.crt: ...
+```
+
+If the certficate contains a chain, it can in certain circumstances be useful to add a delimiter between the certificates in the chain:
+
+```yaml
+tls:
+  pkcs12: ref+azurekeyvault://my-vault/my-vault-certificate
+  crt:
+    delimiter: ","
 ```
 
 If the key and cert are known in PEM format then nothing special to do, e.g.:
@@ -380,7 +427,7 @@ $ kubectl get secret my-secret -o yaml | kube-create-secret re-create -f - | kub
 
 It retrieves the secret from the cluster, re-evaluates the template of it with the latest values for the `vals` references, and then re-applies it on the cluster.
 
-If an extra secret value needs to be added, the template can first be retrieved back via `kube-create-secret show` after which the template can be updated and the secret re-generated via `kube-create-secret create`. 
+If an extra secret value needs to be added, the template can first be retrieved back via `kube-create-secret show` after which the template can be updated and the secret re-generated via `kube-create-secret create`.
 
 ```shell
 $ kubectl get secret my-secret -o yaml | kube-create-secret show -f -
@@ -392,4 +439,4 @@ The `re-create` command is the combination of the `show` command and the `create
 $ kubectl get secret my-secret -o yaml | kube-create-secret show -f - | kube-create-secret create -f | kubectl apply -f -
 ```
 
-When using GitOps with sealed secrets you can either store the secret template next to the generated sealed secret in git, or just the generated sealed secret and then use  `re-create` when the sealed secret needs to be updated. For example, for a sealed secret generated by `kube-create-secret` stored in git, you can do `kube-create-secret re-create -f my-sealed-secret.yml` to see what is in the sealed secret (assuming the `vals` reference values didn't change).
+When using GitOps with sealed secrets you can either store the secret template next to the generated sealed secret in git, or just the generated sealed secret and then use `re-create` when the sealed secret needs to be updated. For example, for a sealed secret generated by `kube-create-secret` stored in git, you can do `kube-create-secret re-create -f my-sealed-secret.yml` to see what is in the sealed secret (assuming the `vals` reference values didn't change).

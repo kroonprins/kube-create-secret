@@ -18,8 +18,8 @@ func createSecret(secretTemplate *types.SecretTemplate, postResolvedSecretTempla
 		if data == nil {
 			data = make(map[string][]byte)
 		}
-		data[constants.TLS_SECRET_KEY_FIELD] = postResolvedSecretTemplateSpec.PostResolvedTls.Key
-		data[constants.TLS_SECRET_CRT_FIELD] = postResolvedSecretTemplateSpec.PostResolvedTls.Crt
+		data[postResolvedSecretTemplateSpec.PostResolvedTls.Key.Name] = postResolvedSecretTemplateSpec.PostResolvedTls.Key.Value
+		data[postResolvedSecretTemplateSpec.PostResolvedTls.Crt.Name] = postResolvedSecretTemplateSpec.PostResolvedTls.Crt.Value
 	}
 
 	metaData, err := getMetaData(secretTemplate)

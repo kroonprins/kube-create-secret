@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/bitnami-labs/sealed-secrets v0.19.3
-	github.com/kroonprins/vals v0.0.1-fork
+	github.com/kroonprins/vals v0.0.2-fork
 	github.com/spf13/cobra v1.6.1
 	github.com/thediveo/enumflag/v2 v2.0.1
 	gopkg.in/yaml.v2 v2.4.0
@@ -88,6 +88,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/itchyny/gojq v0.9.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
@@ -97,6 +98,7 @@ require (
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-ieproxy v0.0.1 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/microsoft/azure-devops-go-api/azuredevops v1.0.0-b5 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect

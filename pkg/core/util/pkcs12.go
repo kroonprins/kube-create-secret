@@ -9,7 +9,7 @@ import (
 	pkcs12 "software.sslmate.com/src/go-pkcs12"
 )
 
-func ToPEM(fileContent string, password string) ([]byte, []byte, error) {
+func ToPEM(fileContent string, password string, chainDelimiter string) ([]byte, []byte, error) {
 	decoded, err := base64.StdEncoding.DecodeString(fileContent)
 	if err != nil {
 		decoded = []byte(fileContent)
@@ -24,7 +24,10 @@ func ToPEM(fileContent string, password string) ([]byte, []byte, error) {
 	x509Certs = append(x509Certs, chain...)
 
 	certs := []byte{}
-	for _, certPem := range x509Certs {
+	for i, certPem := range x509Certs {
+		if i > 0 && chainDelimiter != "" {
+			certs = append(certs, []byte(chainDelimiter)...)
+		}
 		certs = append(certs, pem.EncodeToMemory(
 			&pem.Block{
 				Type:  "CERTIFICATE",
