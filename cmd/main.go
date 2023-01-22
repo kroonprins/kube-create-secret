@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/kroonprins/kube-create-secret/cmd/create"
+	"github.com/kroonprins/kube-create-secret/cmd/new"
 	re_create "github.com/kroonprins/kube-create-secret/cmd/re-create"
 	"github.com/kroonprins/kube-create-secret/cmd/show"
 	"github.com/spf13/cobra"
@@ -21,7 +22,8 @@ func newRootCmd() *cobra.Command {
 		Long:  `Utility for creating kubernetes secrets.`,
 		Example: "  kube-create-secret create -f template.yaml\n" +
 			"  kube-create-secret re-create -f secret.yaml\n" +
-			"  kube-create-secret show -f secret.yaml\n",
+			"  kube-create-secret show -f secret.yaml\n" +
+			"  kube-create-secret new\n",
 	}
 
 	versionCmd := &cobra.Command{
@@ -34,7 +36,7 @@ func newRootCmd() *cobra.Command {
 		},
 	}
 
-	rootCmd.AddCommand(versionCmd, create.Cmd, re_create.Cmd, show.Cmd)
+	rootCmd.AddCommand(versionCmd, create.Cmd, re_create.Cmd, show.Cmd, new.Cmd)
 
 	return rootCmd
 }

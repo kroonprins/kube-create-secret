@@ -19,6 +19,20 @@ var FormatIds = map[Format][]string{
 	SEALED_SECRET: {"sealed-secret"},
 }
 
+type StarterTemplateType int
+
+const (
+	DATA StarterTemplateType = iota
+	STRINGDATA
+	TLS
+)
+
+var StarterTemplateTypes = map[StarterTemplateType][]string{
+	DATA:       {"data"},
+	STRINGDATA: {"stringData"},
+	TLS:        {"tls"},
+}
+
 type SecretTemplate struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

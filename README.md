@@ -17,12 +17,14 @@ Examples:
   kube-create-secret create -f template.yaml
   kube-create-secret re-create -f secret.yaml
   kube-create-secret show -f secret.yaml
+  kube-create-secret new
 
 
 Available Commands:
   create      Create a secret from a SecretTemplate definition.
   re-create   Re-create a secret from a Secret that was previously created with kube-create-secret.
   show        Show the template for a Secret that was previously created with kube-create-secret.
+  new         Print starter template.
 ```
 
 - [Examples](#examples)

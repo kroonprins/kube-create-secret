@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/kroonprins/kube-create-secret/pkg/types"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
 )
@@ -72,6 +73,20 @@ func ShowTemplate(config Config) error {
 	config.InputFormat = inputFormat
 
 	return write(config, secretTemplates)
+}
+
+func StarterTemplate(config Config, templateType types.StarterTemplateType) error {
+	secretTemplate, err := NewStarterTemplate(config, templateType)
+	if err != nil {
+		return err
+	}
+	debug(secretTemplate, "Secret template")
+
+	if len(config.OutputFormats) == 0 {
+		config.OutputFormats = []types.Format{types.YAML}
+	}
+
+	return write(config, []types.SecretTemplate{*secretTemplate})
 }
 
 func debug(object interface{}, objectType string) {
