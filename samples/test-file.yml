@@ -7,6 +7,10 @@ spec:
   metadata:
     name: created-file-secret-1
     namespace: kube-system
+    labels:
+      test-label: foo
+    annotations:
+      test-annotation: bar
   data:
     FILE_1_CONTENT: ref+file://files/test-file-1.txt
     FILE_2_CONTENT: ref+file://files/test-file-2.txt
