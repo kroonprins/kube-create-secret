@@ -14,6 +14,7 @@ import (
 	"github.com/kroonprins/kube-create-secret/pkg/types"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/scheme"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/tools/clientcmd"
 	yaml "sigs.k8s.io/yaml"
 )
