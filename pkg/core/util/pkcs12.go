@@ -20,8 +20,10 @@ func ToPEM(fileContent string, password string, chainDelimiter string) ([]byte, 
 		return nil, nil, fmt.Errorf("failure decoding pkcs12: %v", err)
 	}
 
-	x509Certs := []*x509.Certificate{certificate}
-	x509Certs = append(x509Certs, chain...)
+	x509Certs, err := sorted(certificate, chain)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	certs := []byte{}
 	for i, certPem := range x509Certs {
@@ -49,4 +51,31 @@ func ToPEM(fileContent string, password string, chainDelimiter string) ([]byte, 
 	)
 
 	return key, certs, nil
+}
+
+func sorted(certificate *x509.Certificate, caCerts []*x509.Certificate) ([]*x509.Certificate, error) {
+	res := []*x509.Certificate{certificate}
+	if len(caCerts) == 0 {
+		return res, nil
+	} else {
+		res = append(res, recurse(certificate, caCerts)...)
+	}
+	if len(res) != len(caCerts)+1 {
+		return nil, fmt.Errorf("Unexpected CA chain")
+	}
+	return res, nil
+}
+
+func recurse(certificate *x509.Certificate, caCerts []*x509.Certificate) []*x509.Certificate {
+	for _, caCert := range caCerts {
+		if certificate.Issuer.CommonName == caCert.Subject.CommonName && caCert.Issuer.CommonName == caCert.Subject.CommonName {
+			// root CA
+			return []*x509.Certificate{caCert}
+		}
+		if certificate.Issuer.CommonName == caCert.Subject.CommonName {
+			res := []*x509.Certificate{caCert}
+			return append(res, recurse(caCert, caCerts)...)
+		}
+	}
+	return []*x509.Certificate{}
 }
