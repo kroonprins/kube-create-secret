@@ -4,12 +4,14 @@ import (
 	b "bytes"
 	"context"
 	"crypto/rsa"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 
 	ssv1 "github.com/bitnami-labs/sealed-secrets/pkg/apis/sealedsecrets/v1alpha1"
 	"github.com/bitnami-labs/sealed-secrets/pkg/kubeseal"
+	"github.com/kroonprins/kube-create-secret/pkg/constants"
 	"github.com/kroonprins/kube-create-secret/pkg/core"
 	"github.com/kroonprins/kube-create-secret/pkg/types"
 	corev1 "k8s.io/api/core/v1"
@@ -86,6 +88,7 @@ func (sealedSecretsMarshaller *SealedSecretMarshaller) Marshal(config core.Confi
 		}
 
 		sealedSecret := ssv1.SealedSecret{}
+
 		yaml.Unmarshal(sealed, &sealedSecret)
 		sealedSecrets = append(sealedSecrets, sealedSecret)
 	}
@@ -128,10 +131,36 @@ func marshal(config core.Config, sealedSecrets []ssv1.SealedSecret) ([]byte, err
 		}
 	}
 	if outputFormat == types.YAML {
-		return marshalYaml(sealedSecrets)
+		return marshalYaml(updateAnnotation(sealedSecrets))
 	} else if outputFormat == types.JSON {
 		return marshalJson(sealedSecrets)
 	} else {
 		return nil, fmt.Errorf("unable to find expected output format for sealed secret")
 	}
+}
+
+func updateAnnotation(sealedSecrets []ssv1.SealedSecret) []ssv1.SealedSecret {
+	var updatedSealedSecrets []ssv1.SealedSecret
+	for _, sealedSecret := range sealedSecrets {
+		var annotations = make(map[string]string)
+		for k, v := range sealedSecret.Spec.Template.ObjectMeta.GetAnnotations() {
+			if k == constants.ANNOTATION {
+				// make use of multi-line for yaml output
+				var multiline b.Buffer
+				error := json.Indent(&multiline, []byte(v), "", "  ")
+				if error != nil {
+					log.Fatalf("Unable to read %s annotation %v\n", k, v)
+				}
+				annotations[k] = multiline.String()
+			} else {
+				annotations[k] = v
+			}
+		}
+
+		updatedSealedSecret := sealedSecret.DeepCopy()
+		updatedSealedSecret.Spec.Template.ObjectMeta.SetAnnotations(annotations)
+		updatedSealedSecrets = append(updatedSealedSecrets, *updatedSealedSecret)
+	}
+
+	return updatedSealedSecrets
 }

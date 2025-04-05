@@ -10,7 +10,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func createSecret(secretTemplate *types.SecretTemplate, postResolvedSecretTemplateSpec *types.PostResolvedSecretTemplateSpec) (*corev1.Secret, error) {
+func createSecret(secretTemplate *types.SecretTemplate, postResolvedSecretTemplateSpec *types.PostResolvedSecretTemplateSpec, config Config) (*corev1.Secret, error) {
 	var data = postResolvedSecretTemplateSpec.PostResolvedData
 	stringData := postResolvedSecretTemplateSpec.PostResolvedStringData
 
@@ -22,7 +22,7 @@ func createSecret(secretTemplate *types.SecretTemplate, postResolvedSecretTempla
 		data[postResolvedSecretTemplateSpec.PostResolvedTls.Crt.Name] = postResolvedSecretTemplateSpec.PostResolvedTls.Crt.Value
 	}
 
-	metaData, err := getMetaData(secretTemplate)
+	metaData, err := getMetaData(secretTemplate, config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to construct meta data for result: %v", err)
 	}
@@ -37,8 +37,18 @@ func createSecret(secretTemplate *types.SecretTemplate, postResolvedSecretTempla
 	}, nil
 }
 
-func getMetaData(secretTemplate *types.SecretTemplate) (*v1.ObjectMeta, error) {
-	bytes, err := json.Marshal(*secretTemplate)
+func getMetaData(secretTemplate *types.SecretTemplate, config Config) (*v1.ObjectMeta, error) {
+	var (
+		bytes []byte
+		err   error
+	)
+	if (len(config.OutputFormats) == 0 && config.InputFormat == types.YAML) ||
+		(len(config.OutputFormats) == 1 && config.OutputFormats[0] == types.YAML) {
+		// make use of multi-line for yaml output
+		bytes, err = json.MarshalIndent(*secretTemplate, "", "  ")
+	} else {
+		bytes, err = json.Marshal(*secretTemplate)
+	}
 	if err != nil {
 		return nil, err
 	}
