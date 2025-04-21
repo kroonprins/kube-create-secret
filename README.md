@@ -50,7 +50,7 @@ spec:
   data:
     POSTGRES_PASSWORD: ref+azurekeyvault://my-vault/postgres-password
     POSTGRES_USERNAME: postgres
-    VAR1: ref+envsubst:// \$VAR1
+    VAR1: ref+envsubst://\$VAR1
   stringData:
     API_TOKEN: ref+azurekeyvault://my-vault/api-token
   type: Opaque
@@ -65,7 +65,28 @@ kind: Secret
 metadata:
   creationTimestamp: null
   annotations:
-    kube-create-secret/source: '{"apiVersion":"kube-create-secret/v1","kind":"SecretTemplate","metadata":{"name":"my-secret-template-1"},"spec":{"metadata":{"name":"created-secret-1","namespace":"kube-system"},"data":{"POSTGRES_PASSWORD":"ref+azurekeyvault://my-vault/postgres-password","POSTGRES_USERNAME":"postgres","VAR1":"ref+envsubst://"},"stringData":{"API_TOKEN":"ref+azurekeyvault://my-vault/api-token"},"type":"Opaque"}}'
+    kube-create-secret/source: |-
+      {
+        "apiVersion": "kube-create-secret/v1",
+        "kind": "SecretTemplate",
+        "metadata": {
+          "name": "my-secret-template-1"
+        },
+        "spec": {
+          "metadata": {
+            "name": "created-secret-1",
+            "namespace": "kube-system"
+          },
+          "data": {
+            "POSTGRES_PASSWORD": "ref+azurekeyvault://my-vault/postgres-password",
+            "POSTGRES_USERNAME": "postgres",
+            "VAR1": "ref+envsubst://"
+          },
+          "stringData": {
+            "API_TOKEN": "ref+azurekeyvault://my-vault/api-token"
+          },
+          "type": "Opaque"
+        }
   name: created-secret-1
   namespace: kube-system
 data:
@@ -117,7 +138,27 @@ kind: Secret
 metadata:
   creationTimestamp: null
   annotations:
-    kube-create-secret/source: '{"kind":"SecretTemplate","apiVersion":"kube-create-secret/v1","metadata":{"name":"my-secret-template-1","creationTimestamp":null},"spec":{"kind":"Secret","apiVersion":"v1","metadata":{"name":"created-secret-1","creationTimestamp":null},"type":"Opaque","stringData":{"VAR":"ref+envsubst://$VAR1"}}}'
+    kube-create-secret/source: |-
+      {
+        "kind": "SecretTemplate",
+        "apiVersion": "kube-create-secret/v1",
+        "metadata": {
+          "name": "my-secret-template-1",
+          "creationTimestamp": null
+        },
+        "spec": {
+          "kind": "Secret",
+          "apiVersion": "v1",
+          "metadata": {
+            "name": "created-secret-1",
+            "creationTimestamp": null
+          },
+          "type": "Opaque",
+          "stringData": {
+            "VAR": "ref+envsubst://$VAR1"
+          }
+        }
+      }
   name: created-secret-1
 stringData:
   VAR: foo
@@ -128,7 +169,27 @@ kind: Secret
 metadata:
   creationTimestamp: null
   annotations:
-    kube-create-secret/source: '{"kind":"SecretTemplate","apiVersion":"kube-create-secret/v1","metadata":{"name":"my-secret-template-2","creationTimestamp":null},"spec":{"kind":"Secret","apiVersion":"v1","metadata":{"name":"created-secret-2","creationTimestamp":null},"type":"Opaque","stringData":{"VAR":"ref+envsubst://$VAR2"}}}'
+    kube-create-secret/source: |-
+      {
+        "kind": "SecretTemplate",
+        "apiVersion": "kube-create-secret/v1",
+        "metadata": {
+          "name": "my-secret-template-2",
+          "creationTimestamp": null
+        },
+        "spec": {
+          "kind": "Secret",
+          "apiVersion": "v1",
+          "metadata": {
+            "name": "created-secret-2",
+            "creationTimestamp": null
+          },
+          "type": "Opaque",
+          "stringData": {
+            "VAR": "ref+envsubst://$VAR2"
+          }
+        }
+      }
   name: created-secret-2
 stringData:
   VAR: bar
@@ -249,7 +310,27 @@ kind: Secret
 metadata:
   creationTimestamp: null
   annotations:
-    kube-create-secret/source: '{"kind":"SecretTemplate","apiVersion":"kube-create-secret/v1","metadata":{"name":"my-expanded-secret-template-1","creationTimestamp":null},"spec":{"kind":"Secret","apiVersion":"v1","metadata":{"name":"created-expanded-secret-1","namespace":"kube-system","creationTimestamp":null},"type":"Opaque","data":"ref+azurekeyvault://my-vault#/*","stringData":"ref+azurekeyvault://my-vault#/*"}}'
+    kube-create-secret/source: |-
+      {
+        "kind": "SecretTemplate",
+        "apiVersion": "kube-create-secret/v1",
+        "metadata": {
+          "name": "my-expanded-secret-template-1",
+          "creationTimestamp": null
+        },
+        "spec": {
+          "kind": "Secret",
+          "apiVersion": "v1",
+          "metadata": {
+            "name": "created-expanded-secret-1",
+            "namespace": "kube-system",
+            "creationTimestamp": null
+          },
+          "type": "Opaque",
+          "data": "ref+azurekeyvault://my-vault#/*",
+          "stringData": "ref+azurekeyvault://my-vault#/*"
+        }
+      }
   name: created-expanded-secret-1
   namespace: kube-system
 data:
@@ -290,7 +371,28 @@ kind: Secret
 metadata:
   creationTimestamp: null
   annotations:
-    kube-create-secret/source: '{"kind":"SecretTemplate","apiVersion":"kube-create-secret/v1","metadata":{"name":"my-pkcs12-secret-template","creationTimestamp":null},"spec":{"kind":"Secret","apiVersion":"v1","metadata":{"name":"my-tls-secret","namespace":"default","creationTimestamp":null},"type":"kubernetes.io/tls","tls":{"pkcs12":"ref+azurekeyvault://my-vault/my-vault-certificate"}}}'
+    kube-create-secret/source: |-
+      {
+        "kind": "SecretTemplate",
+        "apiVersion": "kube-create-secret/v1",
+        "metadata": {
+          "name": "my-pkcs12-secret-template",
+          "creationTimestamp": null
+        },
+        "spec": {
+          "kind": "Secret",
+          "apiVersion": "v1",
+          "metadata": {
+            "name": "my-tls-secret",
+            "namespace": "default",
+            "creationTimestamp": null
+          },
+          "type": "kubernetes.io/tls",
+          "tls": {
+            "pkcs12": "ref+azurekeyvault://my-vault/my-vault-certificate"
+          }
+        }
+      }
   name: my-tls-secret
   namespace: default
 data:
@@ -411,7 +513,27 @@ spec:
     metadata:
       creationTimestamp: null
       annotations:
-        kube-create-secret/source: '{"kind":"SecretTemplate","apiVersion":"kube-create-secret/v1","metadata":{"name":"my-sealed-secret-template-1","creationTimestamp":null},"spec":{"kind":"Secret","apiVersion":"v1","metadata":{"name":"created-sealed-secret-1","creationTimestamp":null},"type":"Opaque","data":{"VAR":"ref+envsubst://$VAR1"}}}'
+        kube-create-secret/source: |-
+          {
+            "kind": "SecretTemplate",
+            "apiVersion": "kube-create-secret/v1",
+            "metadata": {
+              "name": "my-sealed-secret-template-1",
+              "creationTimestamp": null
+            },
+            "spec": {
+              "kind": "Secret",
+              "apiVersion": "v1",
+              "metadata": {
+                "name": "created-sealed-secret-1",
+                "creationTimestamp": null
+              },
+              "type": "Opaque",
+              "data": {
+                "VAR": "ref+envsubst://$VAR1"
+              }
+            }
+          }
       name: created-sealed-secret-1
       namespace: default
     type: Opaque
