@@ -51,7 +51,7 @@ func Create(config Config) error {
 		}
 		debug(postResolvedSecretTemplateSpec, "Post-resolved")
 
-		secret, err := createSecret(&secretTemplate, postResolvedSecretTemplateSpec)
+		secret, err := createSecret(&secretTemplate, postResolvedSecretTemplateSpec, config)
 		if err != nil {
 			return fmt.Errorf("failed creating secret: %v", err)
 		}
